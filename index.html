@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Web Worker</title>
+    <style>
+        #data {
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 20px;
+            min-height: 350px;
+            margin: 15px;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Web Worker</h1>
+    <button id="startWorker">启动轮询</button>
+    <button id="stopWorker">停止轮询</button>
+    <div id="data"></div>
+    <script>
+        if (window.Worker) {
+            // const myWorker = new Worker('./worker.js');
+            const myWorker = new Worker('./worker_取消所有活跃的请求.js');
+            document.getElementById('startWorker').onclick = function () {
+                myWorker.postMessage('start_Worker');
+            };
+
+            document.getElementById('stopWorker').onclick = function () {
+                myWorker.postMessage('stop_Worker');
+            };
+
+            myWorker.onmessage = function (e) {
+                if (e.data.error) {
+                    console.error('从Worker接收到错误:', e.data.detail);
+                } else {
+                    console.log('从Worker接收到数据:', e.data);
+                    // payload1: Evevnt 
+                    // payload2: 当其值为 null 时，表示对象的所有属性都将被包含在生成的JSON字符串中
+                    // payload3: 使用n个空格字符的缩进
+                    document.getElementById('data').innerHTML = `<pre>${JSON.stringify(e.data, null, 2)}</pre>`;
+                }
+            };
+        } else {
+            console.log('你的浏览器不支持Web Workers.');
+            document.getElementById('data').innerHTML = '你的浏览器不支持Web Workers.';
+            // 直接使用setTimeout ……
+        }
+    </script>
+</body>
+
+</html>
